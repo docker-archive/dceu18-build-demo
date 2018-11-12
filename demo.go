@@ -44,7 +44,13 @@ func whalesay(p ocispec.Platform) llb.State {
 }
 
 func build(ctx context.Context, c gateway.Client, p ocispec.Platform) (llb.State, ocispec.Image, error) {
-	hi := "Hello World"
+	txt := llb.Local("context", llb.IncludePatterns([]string{"hi.txt"}))
+	bytes, err := util.ReadFromState(ctx, c, txt, "hi.txt")
+	if err != nil {
+		return llb.State{}, ocispec.Image{}, err
+	}
+	hi := string(bytes)
+
 	st := whalesay(p)
 
 	img := ocispec.Image{
